@@ -1,0 +1,1 @@
+add_executable_etiss(scalar_add scalar_add.c)

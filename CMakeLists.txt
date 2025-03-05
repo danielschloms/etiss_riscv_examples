@@ -18,5 +18,7 @@ set(ETISS_LDFLAGS "-L${CMAKE_CURRENT_BINARY_DIR}/riscv_crt0 --specs=${CMAKE_CURR
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ETISS_LDFLAGS}")
 set(ETISS_ELFINI ${CMAKE_CURRENT_SOURCE_DIR}/elffile.ini.in)
 
+SET(VECTOR OFF CACHE BOOL "Compile for RVV.")
+
 add_subdirectory(riscv_crt0)
 add_subdirectory(target_code)
