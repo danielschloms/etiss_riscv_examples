@@ -4,7 +4,7 @@ cd $WS_PATH/etiss_riscv_examples
 rm -rf build
 mkdir -p build/scalar
 mkdir -p build/vector
-INSTALL_PATH=$WS_PATH/perfsim_ws/target_sw/examples/cv32e40xv/custom
+INSTALL_PATH=$WS_PATH/gen_perfsim/target_sw/examples/Vicuna/custom
 SCALAR_DIR=build/scalar
 VECTOR_DIR=build/vector
 
@@ -27,4 +27,9 @@ cd $SCALAR_DIR && make install
 cd -
 cd $VECTOR_DIR && make install
 
+mkdir -p $INSTALL_PATH/dump
 
+for BIN in "$INSTALL_PATH/bin"/*
+do
+    riscv64-unknown-elf-objdump -D "$BIN" > $INSTALL_PATH/dump/$(basename $BIN).dump
+done
