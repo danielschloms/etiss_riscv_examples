@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 int main() {
   int result[20];
   for (int rounds = 0; rounds < 1000; rounds++) {
