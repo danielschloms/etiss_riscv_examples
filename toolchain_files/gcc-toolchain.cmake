@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-message("HELLO FROM TOOLCHAIN")
-
 set(RISCV_TOOLCHAIN_PREFIX "$ENV{RISCV_NO_MLIB}/${RISCV_ARCH}" CACHE STRING "optional prefix for the riscv toolchain in case it is not on the path")
 set(RISCV_TOOLCHAIN_BASENAME "riscv32-unknown-elf" CACHE STRING "base name of the toolchain executables")
 
@@ -19,7 +17,7 @@ endif()
 set(CMAKE_C_COMPILER "${RISCV_TOOLCHAIN}-gcc${EXE_EXT}")
 set(CMAKE_CXX_COMPILER "${RISCV_TOOLCHAIN}-g++${EXE_EXT}")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__riscv__ -march=${RISCV_ARCH} -mabi=${RISCV_ABI}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --save-temps -D__riscv__ -march=${RISCV_ARCH} -mabi=${RISCV_ABI}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__riscv__ -march=${RISCV_ARCH} -mabi=${RISCV_ABI}")
 set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -D__riscv__ -march=${RISCV_ARCH} -mabi=${RISCV_ABI}")
 set(CMAKE_EXE_LINKER_FLAGS "-march=${RISCV_ARCH} -mabi=${RISCV_ABI}")

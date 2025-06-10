@@ -514,6 +514,7 @@ target_link_libraries(tflm PRIVATE
 
 add_subdirectory(Int8/toycar)
 add_subdirectory(Int8/aww)
+add_subdirectory(FP32/toycar)
 
 # if(RISCV_F)
 #     if(RISCV_ZFH)

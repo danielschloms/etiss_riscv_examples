@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(riscv_examples LANGUAGES C CXX ASM)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 
 include(CTest)
 
@@ -28,64 +28,6 @@ if(VERILATOR)
     set(MODEL_DIR ${VICUNA_DIR}/build_model/build)
     set(BENCHMARKS_TOP ${CMAKE_CURRENT_SOURCE_DIR}/target_code/vector)
     set(BSP_TOP ${CMAKE_CURRENT_SOURCE_DIR}/verilator_bsp)
-
-    #These control benchmark configurations specific to the selected RISCV_ARCH
-    # option(RISCV_F "Use the RISC-V F Extension" OFF)
-    # option(RISCV_ZFH "Use the RISC-V ZFH Extension" OFF)
-    # option(RISCV_ZVE32X "Use the RISC-V Embedded V Extension" OFF)
-    # option(RISCV_ZVE32F "Use the RISC-V Embedded V Float Extension" OFF)
-    # option(RISCV_ZVHF "Use the RISC-V V Half Float Extension" OFF)
-
-    # set(AUTOVEC_FLAGS "")
-
-    # if(${RISCV_ARCH} STREQUAL "rv32im") 
-    #     set(RISCV_ABI ilp32)
-    #     option(FH_OPS      "Use FP16 for intermediate operations (no conversion to float)"  OFF)
-        
-    # elseif(${RISCV_ARCH} STREQUAL "rv32im_zicsr")
-    #     set(RISCV_ABI ilp32)  
-    #     option(FH_OPS      "Use FP16 for intermediate operations (no conversion to float)"  OFF)
-
-    # elseif(${RISCV_ARCH} STREQUAL "rv32imf")
-    #     set(RISCV_ABI ilp32f)  
-    #     set(RISCV_F ON)
-    #     option(FH_OPS      "Use FP16 for intermediate operations (no conversion to float)"  OFF)
-        
-    # elseif(${RISCV_ARCH} STREQUAL "rv32imf_zfh")
-    #     set(RISCV_ABI ilp32f)  
-    #     set(RISCV_F ON)
-    #     set(RISCV_ZFH ON)
-    #     option(FH_OPS      "Use FP16 for intermediate operations (no conversion to float)"  ON)
-        
-    # elseif(${RISCV_ARCH} STREQUAL "rv32im_zve32x")
-    #     set(RISCV_ABI ilp32) 
-    #     set(RISCV_ZVE32X ON)
-    #     set(AUTOVEC_FLAGS "-fvectorize -fslp-vectorize -mllvm -scalable-vectorization=on -mllvm --riscv-v-vector-bits-min=${MIN_VLEN}")
-    #     option(FH_OPS      "Use FP16 for intermediate operations (no conversion to float)"  OFF)
-        
-    # elseif(${RISCV_ARCH} STREQUAL "rv32imf_zve32f")
-    #     set(RISCV_ABI ilp32f) 
-    #     set(RISCV_ZVE32X ON)
-    #     set(RISCV_ZVE32F ON)
-    #     set(RISCV_F ON)
-    #     set(AUTOVEC_FLAGS "-fvectorize -fslp-vectorize -mllvm -scalable-vectorization=preferred -mllvm --riscv-v-vector-bits-min=${MIN_VLEN}")
-    #     option(FH_OPS      "Use FP16 for intermediate operations (no conversion to float)"  OFF)
-        
-    # elseif(${RISCV_ARCH} STREQUAL "rv32imf_zfh_zve32f_zvfh")
-    #     set(RISCV_ABI ilp32f) 
-    #     set(RISCV_ZVE32X ON)
-    #     set(RISCV_ZVE32F ON)
-    #     set(RISCV_ZFH ON)
-    #     set(RISCV_F ON)
-    #     set(RISCV_ZVFH ON)
-    #     set(AUTOVEC_FLAGS "-fvectorize -fslp-vectorize -mllvm -scalable-vectorization=preferred -mllvm --riscv-v-vector-bits-min=${MIN_VLEN}")
-    #     option(FH_OPS      "Use FP16 for intermediate operations (no conversion to float)"  ON)
-        
-
-    # else()
-    #     message(FATAL_ERROR "Unsupported RISCV_ARCH selected")
-        
-    # endif()
 
     set(RISCV_CMODEL "medany" CACHE STRING "mcmodel argument to the compiler")
     # Tell CMake about our processor
@@ -113,25 +55,15 @@ if(VERILATOR)
     set(CMAKE_EXECUTABLE_SUFFIX_ASM .elf) 
     set(CMAKE_EXECUTABLE_SUFFIX ".elf") #For some reason setting this works for ASM files but SUFFIX_ASM doesnt
 
-    set(CMAKE_C_STANDARD 11)
-    set(CMAKE_CXX_STANDARD 11)
-
     add_subdirectory(./target_code/vector vector)
     add_subdirectory(./verilator_bsp verilator_bsp)
-
-    # set(BSP_TOP ${CMAKE_CURRENT_SOURCE_DIR}/verilator_bsp)
-    # set(VERILATOR_LDSCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/verilator_bsp/lld_link.ld)
-    # # set(VERILATOR_LDSCRIPT ${CMAKE_CURRENT_BINARY_DIR}/verilator.ld)
-    # include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/verilator.cmake)
-    # add_subdirectory(target_code)
-    # add_subdirectory(verilator_bsp)
 
 else()
 
     set(MEM_ROM_ORIGIN 0x10000000)
     set(MEM_ROM_LENGTH 0x00400000)
     set(MEM_RAM_ORIGIN 0x20000000)
-    set(MEM_RAM_LENGTH 0x00100000)
+    set(MEM_RAM_LENGTH 0x00200000)
     set(MIN_STACK_SIZE 0x1000)
     set(MIN_HEAP_SIZE 0x1000)
     configure_file(etiss.ld.in etiss.ld @ONLY)
