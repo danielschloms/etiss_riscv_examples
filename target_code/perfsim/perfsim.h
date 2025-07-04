@@ -1,6 +1,9 @@
 #pragma once
 
 #ifdef __cplusplus
+#ifdef VERILATOR
+inline void *__dso_handle = (void *)&__dso_handle;
+#endif
 extern "C" {
 #endif
 
@@ -12,10 +15,6 @@ extern "C" {
 #define MATCH_END int bye = address_match_end()
 
 #ifdef VERILATOR
-
-#ifdef __cplusplus
-void *__dso_handle = (void *)&__dso_handle;
-#endif
 
 static inline void terminate_success() {
   __asm__ volatile(

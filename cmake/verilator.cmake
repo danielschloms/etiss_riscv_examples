@@ -11,31 +11,32 @@ macro(add_ml_bin_rtl TEST SOURCE_DIR TEST_BUILD_DIR)
     target_include_directories(${TEST_NAME} PRIVATE
         ${SOURCE_DIR}
         ${SOURCE_DIR}/model_data
+        ${PERFSIM_INCLUDE}
     )
 
     target_compile_definitions(${TEST_NAME} PRIVATE VERILATOR)
 
-    target_sources(${BIN_NAME} PUBLIC
-        ${SOURCE_DIR}/${TARGET}.cpp
-        ${SOURCE_DIR}/${TARGET}_data/${TARGET}_input_data.cc
-        ${SOURCE_DIR}/${TARGET}_data/${TARGET}_input_data.h
-        ${SOURCE_DIR}/${TARGET}_data/${TARGET}_model_data.cc
-        ${SOURCE_DIR}/${TARGET}_data/${TARGET}_model_data.h
-        ${SOURCE_DIR}/${TARGET}_data/${TARGET}_model_settings.cc
-        ${SOURCE_DIR}/${TARGET}_data/${TARGET}_model_settings.h
-        ${SOURCE_DIR}/${TARGET}_data/${TARGET}_output_data_ref.cc
-        ${SOURCE_DIR}/${TARGET}_data/${TARGET}_output_data_ref.h
+    target_sources(${TEST_NAME} PUBLIC
+        ${SOURCE_DIR}/${TEST}.cpp
+        ${SOURCE_DIR}/${TEST}_data/${TEST}_input_data.cc
+        ${SOURCE_DIR}/${TEST}_data/${TEST}_input_data.h
+        ${SOURCE_DIR}/${TEST}_data/${TEST}_model_data.cc
+        ${SOURCE_DIR}/${TEST}_data/${TEST}_model_data.h
+        ${SOURCE_DIR}/${TEST}_data/${TEST}_model_settings.cc
+        ${SOURCE_DIR}/${TEST}_data/${TEST}_model_settings.h
+        ${SOURCE_DIR}/${TEST}_data/${TEST}_output_data_ref.cc
+        ${SOURCE_DIR}/${TEST}_data/${TEST}_output_data_ref.h
     )
 
     #Set Linker
-    target_link_libraries(${TEST_NAME} PRIVATE tflm)
+    message("LINKFILE ${BSP_TOP}/lld_link.ld")
     target_link_options(${TEST_NAME} PRIVATE "-nostartfiles")
     target_link_options(${TEST_NAME} PRIVATE "-T${BSP_TOP}/lld_link.ld")
     # target_link_options(${TEST_NAME} PRIVATE "-T${VERILATOR_LDSCRIPT}")
 
 
     #Link BSP
-    target_link_libraries(${TEST_NAME} PRIVATE bsp_Vicuna UART_Vicuna)
+    target_link_libraries(${TEST_NAME} PUBLIC bsp_Vicuna UART_Vicuna tflm)
 
     add_custom_command(TARGET ${TEST_NAME}
                        POST_BUILD
@@ -63,6 +64,8 @@ macro(add_bin TEST SOURCE_DIR TEST_BUILD_DIR TYPE)
 
     target_include_directories(${TEST_NAME} PRIVATE
         ${SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/target_code/perfsim
+        ${PROJECT_SOURCE_DIR}/target_code/librvv
     )
 
     target_compile_definitions(${TEST_NAME} PRIVATE VERILATOR)
@@ -78,7 +81,7 @@ macro(add_bin TEST SOURCE_DIR TEST_BUILD_DIR TYPE)
 
 
     #Link BSP
-    target_link_libraries(${TEST_NAME} PRIVATE bsp_Vicuna UART_Vicuna)
+    target_link_libraries(${TEST_NAME} PRIVATE bsp_Vicuna UART_Vicuna librvv)
 
     add_custom_command(TARGET ${TEST_NAME}
                        POST_BUILD

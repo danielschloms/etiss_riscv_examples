@@ -5,10 +5,13 @@ project(riscv_examples LANGUAGES C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
 
-include(CTest)
-
 SET(VECTOR OFF CACHE BOOL "Compile for RVV")
 SET(VERILATOR OFF CACHE BOOL "Compile for Verilator")
+SET(PERFSIM_INCLUDE ${PROJECT_SOURCE_DIR}/target_code/perfsim)
+
+SET(EXPORT_COMPILE_COMMANDS On)
+
+add_subdirectory(target_code/librvv)
 
 if(VERILATOR)
     set(RISCV_ARCH rv32im CACHE STRING "Specify the configuration")
@@ -55,8 +58,11 @@ if(VERILATOR)
     set(CMAKE_EXECUTABLE_SUFFIX_ASM .elf) 
     set(CMAKE_EXECUTABLE_SUFFIX ".elf") #For some reason setting this works for ASM files but SUFFIX_ASM doesnt
 
-    add_subdirectory(./target_code/vector vector)
     add_subdirectory(./verilator_bsp verilator_bsp)
+    add_subdirectory(./target_code/vector vector)
+    if (ML)
+        add_subdirectory(./target_code/ml_bench ml_bench)
+    endif()
 
 else()
 

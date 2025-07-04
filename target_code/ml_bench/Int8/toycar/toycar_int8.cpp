@@ -9,11 +9,19 @@
 #include "toycar_int8_data/toycar_int8_model_settings.h"
 #include "toycar_int8_data/toycar_int8_output_data_ref.h"
 
+#include "../../perfsim.h"
+
+#ifdef VERILATOR
 extern "C" {
-#include <stdio.h>
-// #include "runtime.h"
-// #include "uart.h"
-// #include "terminate_benchmark.h"
+#include "runtime.h"
+#include "terminate_benchmark.h"
+#include "uart.h"
+}
+#endif
+
+extern "C" {
+MATCH_BEGIN_DEF
+MATCH_END_DEF
 }
 
 constexpr size_t tensor_arena_size = 256 * 1024;
@@ -33,12 +41,9 @@ int run_test() {
 
   if (interpreter.AllocateTensors() != kTfLiteOk) {
     // TF_LITE_REPORT_ERROR(error_reporter, "ERROR: In AllocateTensors().");
-    printf("Error in AllocateTensors()\n");
     return -1;
   }
 
-  // int const n_rounds = 1;
-  // for (int round = 0; round < n_rounds; round++) {
   for (size_t i = 0; i < toycar_int8_data_sample_cnt; i++) {
     memcpy(interpreter.input(0)->data.int8, (int8_t *)toycar_int8_input_data[i],
            toycar_int8_input_data_len[i]);
@@ -48,7 +53,6 @@ int run_test() {
 
     if (interpreter.Invoke() != kTfLiteOk) {
       // TF_LITE_REPORT_ERROR(error_reporter, "ERROR: In Invoke().");
-      printf("Error in Invoke()\n");
       return -1;
     }
 
@@ -63,39 +67,25 @@ int run_test() {
     uint32_t diff = abs(sum - toycar_int8_output_data_ref[i]);
 
     // store_result_int(diff);
+
     if (diff > 1) {
-
-      printf("ERROR: at #%d, sum %d ref %d diff %d \n", i, sum,
-             toycar_int8_output_data_ref[i], diff);
-
       return -1;
-    } else {
-
-      printf("Sample #%d pass, sum %d ref %d diff %d \n", i, sum,
-             toycar_int8_output_data_ref[i], diff);
     }
   }
-  // }
 
   return 0;
 }
 
 int main(int argc, char *argv[]) {
+
+  MATCH_BEGIN;
   int ret = run_test();
-  //   printf("Ret: %i\n", ret);
+  MATCH_END;
   if (ret != 0) {
-    printf("Failure\n");
-    // #if defined(PRINT_OUTPUTS)
-    // uart_printf("Test Failed!\n");
-    // #endif
-    // benchmark_failure();
+    EXIT_SIM_FAILURE;
 
   } else {
-    printf("Success\n");
-    // #if defined(PRINT_OUTPUTS)
-    // uart_printf("Test Success!\n");
-    // #endif
-    // benchmark_success();
+    EXIT_SIM_SUCCESS;
   }
 
   return ret;

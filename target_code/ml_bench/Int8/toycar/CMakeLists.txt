@@ -17,7 +17,13 @@
 #
 # add_Benchmark(toycar_int8 ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_DIR}/benchmark_sources/Int8/toycar)
 
-add_ml_executable(toycar_int8 ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_DIR}/benchmark_sources/Int8/toycar)
+if (VERILATOR)
+    include(${PROJECT_SOURCE_DIR}/cmake/verilator.cmake)
+    add_ml_bin_rtl(toycar_int8 ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_DIR}/ml_bench/Int8/toycar cpp)
+else()
+    add_ml_executable(toycar_int8 ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
+
 
 
 

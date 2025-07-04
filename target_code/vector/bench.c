@@ -1,9 +1,6 @@
 #include <riscv_vector.h>
 #include <stdint.h>
 
-#if __riscv_v_intrinsic >= 1000000
-#endif
-
 #ifdef VERILATOR
 #include "terminate.h"
 #else
@@ -19,14 +16,14 @@
 #define MUL 3
 #define DIV 4
 
-#define INT_OP_END 5
+#define INT_OP_END 1
 
 #define FADD 0
 #define FSUB 1
 #define FMUL 2
 #define FDIV 3
 
-#define FLOAT_OP_END 4
+#define FLOAT_OP_END 0
 
 // static inline __attribute__((always_inline))
 
@@ -861,7 +858,7 @@ int run_vector_int() {
       int err = run_v_int_arith_i32(op, round);
 
       err |= run_v_int_arith_i16(op, round);
-      
+
       err |= run_v_int_arith_i8(op, round);
       // int_golden(a, b, result_golden, op);
       // v_int_arith_i32x1(a_ptr, b_ptr, result_ptr, op);

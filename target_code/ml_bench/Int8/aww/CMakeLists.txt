@@ -15,7 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-message("Hello AWW_INT8")
-add_ml_executable(aww_int8 ${CMAKE_CURRENT_SOURCE_DIR})
+if (VERILATOR)
+    include(${PROJECT_SOURCE_DIR}/cmake/verilator.cmake)
+    add_ml_bin_rtl(aww_int8 ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_DIR}/ml_bench/Int8/aww cpp)
+else()
+    add_ml_executable(aww_int8 ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 

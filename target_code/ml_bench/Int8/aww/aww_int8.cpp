@@ -14,11 +14,19 @@
 #include "tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 
+#include "../../perfsim.h"
+
+#ifdef VERILATOR
 extern "C" {
-#include <stdio.h>
-// #include "runtime.h"
-// #include "uart.h"
-// #include "terminate_benchmark.h"
+#include "runtime.h"
+#include "terminate_benchmark.h"
+#include "uart.h"
+}
+#endif
+
+extern "C" {
+MATCH_BEGIN_DEF
+MATCH_END_DEF
 }
 
 constexpr size_t tensor_arena_size = 256 * 1024;
@@ -72,29 +80,19 @@ int run_test() {
       // uart_printf("ERROR: at #%d, top_index %d aww_int8_output_data_ref %d
       // \n", i, top_index, aww_int8_output_data_ref[i]);
       return -1;
-    } else {
-      // uart_printf("Sample #%d pass, top_index %d matches ref %d \n", i,
-      // top_index, aww_int8_output_data_ref[i]);
     }
   }
   return 0;
 }
 
 int main(int argc, char *argv[]) {
+  MATCH_BEGIN;
   int ret = run_test();
+  MATCH_END;
   if (ret != 0) {
-    printf("Success\n");
-    // #if defined(PRINT_OUTPUTS)
-    // uart_printf("Test Failed!\n");
-    // #endif
-    // benchmark_failure();
-
+    EXIT_SIM_FAILURE;
   } else {
-    printf("Failure\n");
-    // #if defined(PRINT_OUTPUTS)
-    // uart_printf("Test Success!\n");
-    // #endif
-    // benchmark_success();
+    EXIT_SIM_SUCCESS;
   }
 
   return ret;

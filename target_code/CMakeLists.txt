@@ -3,7 +3,12 @@ macro(add_executable_etiss TARGET)
 
 	add_executable(${TARGET} ${SRC_FILES})
 	add_dependencies(${TARGET} etiss_crt0)
-	target_include_directories(${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/riscv_crt0)
+
+	target_include_directories(
+        ${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/riscv_crt0
+        ${PROJECT_SOURCE_DIR}/target_code/librvv)
+
+    target_link_libraries(${TARGET} PRIVATE librvv)
 	set(BIN_NAME ${TARGET})
 
 	configure_file(${ETISS_ELFINI} ${TARGET}.ini @ONLY)
@@ -23,6 +28,7 @@ macro(add_ml_executable TARGET SOURCE_DIR)
     target_include_directories(${BIN_NAME} PRIVATE
         ${SOURCE_DIR}
         ${SOURCE_DIR}/model_data
+        ${PERFSIM_INCLUDE}
     )
 
     target_sources(${BIN_NAME} PUBLIC
@@ -57,11 +63,12 @@ SET(ML OFF CACHE BOOL "Compile ML programs.")
 if (VECTOR)
 	message("Compiling Vector Programs.")
 	add_subdirectory(vector)
+    # add_subdirectory(cpp)
     # add_subdirectory(vbench)
     # add_subdirectory(dhry)
-    # if (ML)
-    #     add_subdirectory(ml_bench)
-    # endif()
+    if (ML)
+        add_subdirectory(ml_bench)
+    endif()
 else()
 	message("Compiling Scalar Programs.")
 	# add_subdirectory(scalar)
