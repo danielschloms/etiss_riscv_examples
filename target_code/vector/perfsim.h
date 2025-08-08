@@ -5,16 +5,24 @@ extern "C" {
 #endif
 
 #define MATCH_BEGIN_DEF                                                        \
-  int __attribute__((noinline)) address_match_start() { return 1; }
+  int __attribute__((noinline)) address_match_start() {                        \
+    volatile int r = 1;                                                        \
+    return r;                                                                  \
+  }
+
 #define MATCH_END_DEF                                                          \
-  int __attribute__((noinline)) address_match_end() { return 2; }
-#define MATCH_BEGIN int hello = address_match_start()
-#define MATCH_END int bye = address_match_end()
+  int __attribute__((noinline)) address_match_end() {                          \
+    volatile int r = 2;                                                        \
+    return r;                                                                  \
+  }
+
+#define MATCH_BEGIN volatile int hello = address_match_start()
+#define MATCH_END volatile int bye = address_match_end()
 
 #ifdef VERILATOR
 
 #ifdef __cplusplus
-void *__dso_handle = (void *)&__dso_handle;
+// void *__dso_handle = (void *)&__dso_handle;
 #endif
 
 static inline void terminate_success() {
@@ -32,21 +40,21 @@ static inline void terminate_failure() {
 }
 
 #define EXIT_SIM_SUCCESS                                                       \
-  terminate_success();                                                         \
+  address_match_end : terminate_success();                                     \
   return hello + bye;
 
 #define EXIT_SIM_FAILURE                                                       \
-  terminate_failure();                                                         \
+  address_match_end : terminate_failure();                                     \
   return hello + bye;
 
 #else
 #include <stdio.h>
 #define EXIT_SIM_SUCCESS                                                       \
-  printf("Success\n");                                                         \
+  address_match_end : printf("Success\n");                                     \
   return hello + bye;
 
 #define EXIT_SIM_FAILURE                                                       \
-  printf("Fail\n");                                                            \
+  address_match_end : printf("Fail\n");                                        \
   return hello + bye;
 
 #endif

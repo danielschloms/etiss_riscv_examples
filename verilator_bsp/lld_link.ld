@@ -11,85 +11,97 @@ __DYNAMIC = 0;
 
 MEMORY
 {
-    boot : ORIGIN = 0x00000000, LENGTH = 0x00002000 /*   8 kB */
-    ram  : ORIGIN = 0x00002000, LENGTH = 0x003FE000 /* 248 kB */
+
+    /* 
+    MEM_ROM_ORIGIN = 0x10000000
+    MEM_ROM_LENGTH = 0x00400000
+    MEM_RAM_ORIGIN = 0x20000000
+    MEM_RAM_LENGTH = 0x00200000
+    MIN_STACK_SIZE = 0x1000
+    MIN_HEAP_SIZE  = 0x1000 
+    */
+    
+    BOOT : ORIGIN = 0x00000000, LENGTH = 0x00002000
+    ROM  : ORIGIN = 0x10000000, LENGTH = 0x00400000
+    RAM  : ORIGIN = 0x20000000, LENGTH = 0x00200000
 }
 
-STACK_LEN = 0x4000; /* 16 kB */
+STACK_LEN = 0x1000; /* 4 kB */
+/* STACK_LEN = 0x4000; /* 16 kB */
+
+__stack_size     = 0x1000;
+__heap_size      = 0x1000;
 
 SECTIONS
 {
+
+    /* --- BOOT --- */
     .vectors 0 : {
         *(.vectors)
-    } >boot
+    } > BOOT
 
-    .text : {
-        . = ALIGN(4);
-        _stext = .;
-        *(.text)
-        *(.text.*)
-        _etext  =  .;
-        __CTOR_LIST__ = .;
-        LONG((__CTOR_END__ - __CTOR_LIST__) / 4 - 2)
-        *(.ctors)
-        LONG(0)
-        __CTOR_END__ = .;
-        __DTOR_LIST__ = .;
-        LONG((__DTOR_END__ - __DTOR_LIST__) / 4 - 2)
-        *(.dtors)
-        LONG(0)
-        __DTOR_END__ = .;
-        *(.lit)
-        *(.shdata)
-        . = ALIGN(4);
-        _endtext = .;
-    } >ram
+  /* ================ ROM ================ */
 
-    .rodata : {
-        . = ALIGN(4);
-        *(.rodata);
-        *(.rodata.*)
-    } >ram
+  .text : {
+    *(.text .text.* )
+  }  > ROM
 
-    .shbss : {
-        . = ALIGN(4);
-        *(.shbss)
-    } >ram
-
-    .data : {
-        . = ALIGN(4);
-        sdata = .;
-        _sdata = .;
-        *(.data);
-        *(.data.*)
-        edata = .;
-        _edata = .;
-    } >ram
-
-    .bss (NOLOAD) : {
-        . = ALIGN(4);
-        _bss_start = .;
-        *(.bss)
-        *(.bss.*)
-        *(.sbss)
-        *(.sbss.*)
-        *(COMMON)
-        _bss_end = .;
-    } >ram
-
-    .user_align (NOLOAD) : {
-        . = ALIGN(0x1000);
-        _user_start = .;
-    } >ram
+  .rodata : {
+    *(.rodata .rodata.*)
+  } > ROM
+  .srodata : {
+    *(.srodata .srodata.*)
+  } > ROM
 
 
-    .stack ORIGIN(ram) + LENGTH(ram) - STACK_LEN (NOLOAD) : {
-        . = ALIGN(16);
-        _stack_start = .;
-        . = . + STACK_LEN;
-        . = ALIGN(16);
-        stack = .;
-        _stack = .;
-        _stack_end = .;
-    } >ram
+
+  /* ================ RAM ================ */
+
+  .init_array : {
+    PROVIDE_HIDDEN (__init_array_start = .);
+    KEEP (*(.init_array .init_array.*))
+    PROVIDE_HIDDEN (__init_array_end = .);
+  } > RAM
+  .fini_array : {
+    PROVIDE_HIDDEN (__fini_array_start = .);
+    KEEP (*(.fini_array .fini_array.*))
+    PROVIDE_HIDDEN (__fini_array_end = .);
+  } > RAM
+
+  .gcc_except_table : {
+    *(.gcc_except_table .gcc_except_table.*)
+  } > RAM
+
+  .eh_frame : {
+    KEEP (*(.eh_frame))
+  } > RAM
+
+  __data_start = .;
+  .data : {
+      *(.data .data.*)
+  } > RAM
+  __sdata_start = .;
+  .sdata : {
+      *(.sdata .sdata.*)
+  } > RAM
+
+  _bss_start = .;
+  .sbss : {
+      *(.sbss .sbss.*)
+  } > RAM
+  .bss : {
+      *(.bss .bss.*)
+  } > RAM
+  _bss_end = .;
+
+  /* do not place anything after this address, because the heap starts here! */
+
+  /* point the global pointer so it can access sdata, sbss, data and bss */
+  __global_pointer$ = MIN(__sdata_start + 0x800, MAX(__data_start + 0x800, _bss_end - 0x800));
+
+  /* stack pointer starts at the top of the ram */
+  _stack = ORIGIN(RAM) + LENGTH(RAM);
+  .stack : {
+    ASSERT ((_stack > (_bss_end + __heap_size + __stack_size)), "Error: RAM too small for heap and stack");
+  } > RAM
 }

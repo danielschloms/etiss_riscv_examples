@@ -17,10 +17,19 @@ endif()
 set(CMAKE_C_COMPILER "${RISCV_TOOLCHAIN}-gcc${EXE_EXT}")
 set(CMAKE_CXX_COMPILER "${RISCV_TOOLCHAIN}-g++${EXE_EXT}")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --save-temps -D__riscv__ -march=${RISCV_ARCH} -mabi=${RISCV_ABI}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__riscv__ -march=${RISCV_ARCH} -mabi=${RISCV_ABI}")
-set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -D__riscv__ -march=${RISCV_ARCH} -mabi=${RISCV_ABI}")
-set(CMAKE_EXE_LINKER_FLAGS "-march=${RISCV_ARCH} -mabi=${RISCV_ABI}")
+set(MIN_VLEN "32" CACHE STRING "Zvl x b")
+# set(VBITS_FLAG "-mrvv-vector-bits=zvl")
+set(VBITS_FLAG "")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ftree-vectorize --save-temps -D__riscv__ -march=${RISCV_ARCH}_zvl${MIN_VLEN}b -mabi=${RISCV_ABI} ${VBITS_FLAG}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftree-vectorize -fno-use-cxa-atexit -D__riscv__ -march=${RISCV_ARCH}_zvl${MIN_VLEN}b -mabi=${RISCV_ABI} ${VBITS_FLAG}")
+set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -D__riscv__ -march=${RISCV_ARCH}_zvl${MIN_VLEN}b -mabi=${RISCV_ABI} ${VBITS_FLAG}")
+set(CMAKE_EXE_LINKER_FLAGS "-march=${RISCV_ARCH}_zvl${MIN_VLEN}b -mabi=${RISCV_ABI} ${VBITS_FLAG}")
+
+# message("CC ${CMAKE_C_COMPILER}")
+# message("CFLAGS ${CMAKE_C_FLAGS}")
+# message("CXX ${CMAKE_CXX_COMPILER}")
+# message("CXXFLAGS ${CMAKE_CXX_FLAGS}")
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR ${RISCV_ARCH})

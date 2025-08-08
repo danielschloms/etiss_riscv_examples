@@ -37,6 +37,7 @@ macro(add_ml_bin_rtl TEST SOURCE_DIR TEST_BUILD_DIR)
 
     #Link BSP
     target_link_libraries(${TEST_NAME} PUBLIC bsp_Vicuna UART_Vicuna tflm)
+    target_link_libraries(${TEST_NAME} PRIVATE tflm)
 
     add_custom_command(TARGET ${TEST_NAME}
                        POST_BUILD
@@ -56,10 +57,11 @@ macro(add_ml_bin_rtl TEST SOURCE_DIR TEST_BUILD_DIR)
 
 endmacro()
 
-macro(add_bin TEST SOURCE_DIR TEST_BUILD_DIR TYPE)
+macro(add_bin TEST SOURCE_DIR TEST_BUILD_DIR)
 
     set(TEST_NAME ${TEST}) #need to add a suffix, ctest doesn't allow 'test' as a test name
-    
+    set(SRC_FILES "${ARGN}")
+
     add_executable(${TEST_NAME})
 
     target_include_directories(${TEST_NAME} PRIVATE
@@ -70,9 +72,7 @@ macro(add_bin TEST SOURCE_DIR TEST_BUILD_DIR TYPE)
 
     target_compile_definitions(${TEST_NAME} PRIVATE VERILATOR)
 
-    target_sources(${TEST_NAME} PUBLIC
-        ${SOURCE_DIR}/${TEST}.${TYPE}
-    )
+    target_sources(${TEST_NAME} PUBLIC ${SRC_FILES})
 
     #Set Linker
     target_link_options(${TEST_NAME} PRIVATE "-nostartfiles")

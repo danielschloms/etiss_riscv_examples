@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 SET(VECTOR OFF CACHE BOOL "Compile for RVV")
 SET(VERILATOR OFF CACHE BOOL "Compile for Verilator")
+SET(RISCV_F OFF CACHE BOOL "Floating Point Unit")
 SET(PERFSIM_INCLUDE ${PROJECT_SOURCE_DIR}/target_code/perfsim)
 
 SET(EXPORT_COMPILE_COMMANDS On)
@@ -37,8 +38,8 @@ if(VERILATOR)
     set(CMAKE_SYSTEM_PROCESSOR ${RISCV_ARCH})
     # The Generic system name is used for bare-metal targets (without OS) in CMake
     set(CMAKE_SYSTEM_NAME Generic)
-    message("TOOLCHAIN PATH ${CMAKE_CURRENT_SOURCE_DIR}/toolchain_files/gcc-toolchain.cmake")
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/toolchain_files/gcc-toolchain.cmake")
+    # message("TOOLCHAIN PATH ${CMAKE_CURRENT_SOURCE_DIR}/toolchain_files/gcc-toolchain.cmake")
+    # set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/toolchain_files/gcc-toolchain.cmake")
     ####
     # Set build mode, Release by default
     ####
