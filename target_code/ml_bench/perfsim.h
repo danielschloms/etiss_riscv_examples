@@ -1,20 +1,28 @@
 #pragma once
 
 #ifdef __cplusplus
-#ifdef VERILATOR
-inline void *__dso_handle = (void *)&__dso_handle;
-#endif
 extern "C" {
 #endif
 
 #define MATCH_BEGIN_DEF                                                        \
-  int __attribute__((noinline)) address_match_start() { return 1; }
+  int __attribute__((noinline)) address_match_start() {                        \
+    volatile int r = 1;                                                        \
+    return r;                                                                  \
+  }
+
 #define MATCH_END_DEF                                                          \
-  int __attribute__((noinline)) address_match_end() { return 2; }
-#define MATCH_BEGIN int hello = address_match_start()
-#define MATCH_END int bye = address_match_end()
+  int __attribute__((noinline)) address_match_end() {                          \
+    volatile int r = 2;                                                        \
+    return r;                                                                  \
+  }
+
+#define MATCH_BEGIN volatile int hello = address_match_start()
+#define MATCH_END volatile int bye = address_match_end()
 
 #ifdef VERILATOR
+#ifdef __cplusplus
+void *__dso_handle = (void *)&__dso_handle;
+#endif
 
 static inline void terminate_success() {
   __asm__ volatile(

@@ -29,8 +29,9 @@ add_definitions(-DTF_LITE_USE_GLOBAL_MAX)
 add_definitions(-DTF_LITE_USE_GLOBAL_MIN)
 add_definitions(-DTF_LITE_STATIC_MEMORY)
 add_definitions(-DTF_LITE_USE_GLOBAL_CMATH_FUNCTIONS)
-if(NOT USE_F)
-    add_definitions(-DTFLITE_EMULATE_FLOAT)                         #Might have issues with this for F extensions
+if(NOT RISCV_F)
+  # message(FATAL_ERROR "Oops")  
+  add_definitions(-DTFLITE_EMULATE_FLOAT)                         #Might have issues with this for F extensions
 endif()
 add_definitions(-fno-rtti)          #Needed for GCC to resolve virtual delete function scope issue
 add_definitions(-fno-exceptions)    #Needed for GCC to resolve virtual delete function scope issue
@@ -38,7 +39,7 @@ add_definitions(-fno-exceptions)    #Needed for GCC to resolve virtual delete fu
 if(RISCV_ZFH)
 #Need to include custom tflm files for fp16 support
     if(FH_OPS)
-        message("USING FP16 INTERMEDIATE OPS")
+        message(STATUS "Using FP16 intermediate ops")
         set(FH_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/FH_Support/16_bit_ops)
         
         set(FH_SUPPORT_SRCS
@@ -69,7 +70,7 @@ if(RISCV_ZFH)
         ${FH_INCLUDE}/softmax_common.cc
         )
     else()
-        message("USING FP32 INTERMEDIATE OPS WITH FP16 INPUTS")
+        message(STATUS "Using FP32 intermediate ops with FP16 inputs")
         set(FH_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/FH_Support/32_bit_ops)
         
         set(FH_SUPPORT_SRCS
@@ -107,7 +108,7 @@ if(RISCV_ZFH)
     
     endif()
 else()
-    message("USING DEFAULT OPS")
+    message(STATUS "Using default ops")
     set(FH_INCLUDE "")
     #No FH support, use original sources
     set(FH_SUPPORT_SRCS
@@ -513,7 +514,7 @@ target_link_libraries(tflm PRIVATE
 )
 
 add_subdirectory(Int8/toycar)
-add_subdirectory(Int8/aww)
+# add_subdirectory(Int8/aww)
 # add_subdirectory(FP32/toycar)
 
 # if(RISCV_F)

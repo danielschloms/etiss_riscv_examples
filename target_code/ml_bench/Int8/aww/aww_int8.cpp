@@ -16,14 +16,6 @@
 
 #include "../../perfsim.h"
 
-#ifdef VERILATOR
-extern "C" {
-#include "runtime.h"
-#include "terminate_benchmark.h"
-#include "uart.h"
-}
-#endif
-
 extern "C" {
 MATCH_BEGIN_DEF
 MATCH_END_DEF
@@ -88,6 +80,7 @@ int run_test() {
 int main(int argc, char *argv[]) {
   MATCH_BEGIN;
   int ret = run_test();
+endlabel:
   MATCH_END;
   if (ret != 0) {
     EXIT_SIM_FAILURE;

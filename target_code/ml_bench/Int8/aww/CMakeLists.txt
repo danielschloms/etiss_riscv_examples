@@ -16,9 +16,8 @@
 # limitations under the License.
 #
 if (VERILATOR)
-    include(${PROJECT_SOURCE_DIR}/cmake/verilator.cmake)
-    add_ml_bin_rtl(aww_int8 ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_DIR}/ml_bench/Int8/aww cpp)
+    add_ml_executable_verilator(aww_int8 ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_DIR}/ml_bench/Int8/aww cpp)
 else()
-    add_ml_executable(aww_int8 ${CMAKE_CURRENT_SOURCE_DIR})
+    add_ml_executable_etiss(aww_int8 ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
