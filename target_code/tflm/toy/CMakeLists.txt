@@ -1,9 +1,11 @@
 project(tflm_toy)
 
-if (VERILATOR)
+if(VERILATOR)
   add_executable_verilator(${PROJECT_NAME})
-else()
+elseif(ETISS)
   add_executable_etiss(${PROJECT_NAME})
+else()
+  add_executable_qemu(${PROJECT_NAME})
 endif()
 
 # Needed to run TensorFlow code with RISC-V toolchain
@@ -33,8 +35,9 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
   -DTF_LITE_USE_GLOBAL_CMATH_FUNCTIONS
   -DTF_LITE_STATIC_MEMORY
   -DTF_LITE_STRIP_ERROR_STRINGS
+  -DTF_LITE_EMULATE_FLOAT
 )
 
-if (TFLM_EMULATE_FLOAT)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE -DTFLITE_EMULATE_FLOAT)
-endif()
+# if(TFLM_EMULATE_FLOAT)
+#   target_compile_definitions(${PROJECT_NAME} PRIVATE -DTF_LITE_EMULATE_FLOAT)
+# endif()

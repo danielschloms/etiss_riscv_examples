@@ -9,8 +9,8 @@ POSITIONAL_ARGS=()
 
 # Default arguments
 BUILD_TYPE="Release"
-COMPILER="llvm"
-ARCH="rv32im_zve32x"
+COMPILER="llvm-scalar"
+ARCH="rv32im_zicsr"
 ABI="ilp32"
 VLEN="64"
 GENERATOR="Ninja"
@@ -18,26 +18,6 @@ CMAKE_TARGET="all"
 CLEAN_BEFORE="false"
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --arch)
-      ARCH="$2"
-      shift # past argument
-      shift # past value
-      ;;
-    --abi)
-      ABI="$2"
-      shift # past argument
-      shift # past value
-      ;;
-    --vlen)
-      VLEN="$2"
-      shift # past argument
-      shift # past value
-      ;;
-    --compiler)
-      COMPILER="$2"
-      shift # past argument
-      shift # past value
-      ;;
     --target)
       CMAKE_TARGET="$2"
       shift # past argument
@@ -49,14 +29,6 @@ while [[ $# -gt 0 ]]; do
       ;;
     --clean)
       CLEAN_BEFORE="true"
-      shift # past argument
-      ;;
-    --ml)
-      CMAKE_TARGET="tflm_benchmarks"
-      shift # past argument
-      ;;
-    --sanity)
-      CMAKE_TARGET="sanitycheck"
       shift # past argument
       ;;
     -*|--*)
@@ -72,13 +44,12 @@ done
 
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
-ZVL_STRING="zvl${VLEN}b"
-ETISS_BUILD_DIR=$PROJECT_DIR/build/etiss/$ARCH/$ZVL_STRING
-QEMU_BUILD_DIR=$PROJECT_DIR/build/qemu/$ARCH/$ZVL_STRING
-VERILATOR_BUILD_DIR=$VERILATOR_DIR/build_from_other/$ARCH/$ZVL_STRING
+ETISS_BUILD_DIR=$PROJECT_DIR/build/etiss/$ARCH
+QEMU_BUILD_DIR=$PROJECT_DIR/build/qemu/$ARCH
+VERILATOR_BUILD_DIR=$VERILATOR_DIR/build_from_other/$ARCH
 TOOLCHAIN="$PROJECT_DIR/toolchain_files/${COMPILER}-toolchain.cmake"
-INSTALL_PATH_ETISS=$WS_PATH/gen_perfsim/target_sw/examples/Vicuna/custom/$ARCH/$ZVL_STRING
-INSTALL_PATH_QEMU=$WS_PATH/qemu-testing/bins/$ARCH/$ZVL_STRING
+INSTALL_PATH_ETISS=$WS_PATH/gen_perfsim/target_sw/examples/Vicuna/custom/$ARCH
+INSTALL_PATH_QEMU=$WS_PATH/qemu-testing/bins/$ARCH
 
 if [[ "$CLEAN_BEFORE" = "true" ]]; then
   rm -rf $ETISS_BUILD_DIR
@@ -94,7 +65,6 @@ cmake -S $PROJECT_DIR -B $ETISS_BUILD_DIR \
   -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
   -DRISCV_ARCH=$ARCH \
   -DRISCV_ABI=$ABI \
-  -DVLEN=$VLEN \
   -G "$GENERATOR"
 
 cmake -S $PROJECT_DIR -B $QEMU_BUILD_DIR \
@@ -106,7 +76,6 @@ cmake -S $PROJECT_DIR -B $QEMU_BUILD_DIR \
   -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
   -DRISCV_ARCH=$ARCH \
   -DRISCV_ABI=$ABI \
-  -DVLEN=$VLEN \
   -G "$GENERATOR"
 
 cmake -S $PROJECT_DIR -B $VERILATOR_BUILD_DIR \
@@ -118,7 +87,6 @@ cmake -S $PROJECT_DIR -B $VERILATOR_BUILD_DIR \
   -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
   -DRISCV_ARCH=$ARCH \
   -DRISCV_ABI=$ABI \
-  -DVLEN=$VLEN \
   -G "$GENERATOR"
 
 cmake --build $ETISS_BUILD_DIR --target $CMAKE_TARGET -j$(nproc)

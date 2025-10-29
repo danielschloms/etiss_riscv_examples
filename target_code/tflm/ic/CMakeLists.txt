@@ -1,7 +1,10 @@
 project(tflm_ic)
 
-add_executable_etiss(${PROJECT_NAME})
-
+if (VERILATOR)
+  add_executable_verilator(${PROJECT_NAME})
+else()
+  add_executable_etiss(${PROJECT_NAME})
+endif()
 
 # Needed to run TensorFlow code with RISC-V toolchain
 

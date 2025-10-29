@@ -12,6 +12,15 @@ macro(add_executable_etiss TARGET)
     install(TARGETS ${TARGET} DESTINATION bin OPTIONAL)
 endmacro()
 
+macro(add_executable_qemu TARGET)
+    set(SRC_FILES "${ARGN}")
+
+    add_executable(${TARGET} ${SRC_FILES})
+    target_include_directories(${TARGET} PRIVATE ${LIBS_DIR})
+
+    install(TARGETS ${TARGET} DESTINATION bin OPTIONAL)
+endmacro()
+
 macro(add_executable_verilator TARGET)
     set(SRC_FILES "${ARGN}")
 
@@ -57,9 +66,22 @@ option(TFLM "MURISCVNN" ON)
 # if(TVM)
 #   add_subdirectory(tvm)
 # endif()
+add_custom_target(ml_bench)
+add_custom_target(sanitycheck)
+add_custom_target(simple_bench)
+
+add_subdirectory(sanitycheck)
+add_subdirectory(simple_bench)
 if(TFLM)
     add_subdirectory(tflm)
 endif()
+
+add_custom_target(thesis_results)
+add_dependencies(thesis_results
+    sanitycheck
+    ml_bench
+)
+
 # if(EMBENCH)
 #   add_subdirectory(embench)
 # endif()

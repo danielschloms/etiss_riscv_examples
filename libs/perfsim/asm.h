@@ -67,5 +67,33 @@
   NOP_8;
 
 #define NOP_32                                                                 \
-  NOP_16;                                                                       \
+  NOP_16;                                                                      \
   NOP_16;
+
+#define NOP_64                                                                 \
+  NOP_32;                                                                      \
+  NOP_32;
+
+#define NOP_128                                                                \
+  NOP_64;                                                                      \
+  NOP_64;
+
+#define NOP_256                                                                \
+  NOP_128;                                                                     \
+  NOP_128;
+
+#define NOP_512                                                                \
+  NOP_256;                                                                     \
+  NOP_256;
+
+#define NOP_1024                                                               \
+  NOP_512;                                                                     \
+  NOP_512;
+
+#define NOP_2048                                                               \
+  NOP_1024;                                                                    \
+  NOP_1024;
+
+#define NOP_4096                                                               \
+  NOP_2048;                                                                    \
+  NOP_2048;

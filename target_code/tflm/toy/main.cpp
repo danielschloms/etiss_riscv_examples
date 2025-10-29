@@ -1,10 +1,3 @@
-// #include <cmath>
-// #include <cstdarg>
-// #include <cstdint>
-// #include <cstdio>
-// #include <cstdlib>
-// #include <cstring>
-
 #include "perfsim/perfsim.h"
 
 #include "tensorflow/lite/micro/micro_interpreter.h"
@@ -21,7 +14,7 @@ MATCH_BEGIN_DEF
 MATCH_END_DEF
 }
 
-// #define CHECK 0
+#define CHECK 1
 #ifndef CHECK
 #define CHECK 1
 #endif
@@ -65,13 +58,12 @@ int run_test() {
 #if CHECK
     uint32_t sum = 0;
     for (size_t j = 0; j < toy_input_data_len[i]; j++) {
-      sum += pow((int8_t)toy_input_data[i][j] -
-                     interpreter.output(0)->data.int8[j],
-                 2);
-      //   auto io_diff =
-      //       (int8_t)toy_input_data[i][j] -
-      //       interpreter.output(0)->data.int8[j];
-      //   sum += (io_diff * io_diff);
+      // sum += pow((int8_t)toy_input_data[i][j] -
+      //                interpreter.output(0)->data.int8[j],
+      //            2);
+      auto const io_diff =
+          (int8_t)toy_input_data[i][j] - interpreter.output(0)->data.int8[j];
+      sum += (io_diff * io_diff);
     }
     sum /= toy_input_data_len[i];
 

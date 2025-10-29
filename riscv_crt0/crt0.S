@@ -36,6 +36,12 @@
 .global _start
 _start:
 
+  # Enable RVV
+  csrr            a0, mstatus
+  li              a1, 0x00002200      #Init FS bits to enable F-EXT and VS bits to enable V-EXT
+  or              a0, a0, a1
+  csrw            mstatus, a0
+
   # setup "Machine Trap-Vector Base-Address"
   # mode is 0 -> all exceptions go to same code
   la      t0, _trap_vector
