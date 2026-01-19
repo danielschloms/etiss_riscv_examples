@@ -1,4 +1,4 @@
-#define N_ITERATIONS 1000
+#define N_ITERATIONS 1000000000
 #include <riscv_vector.h>
 #include <stddef.h>
 #include <stdint.h>
