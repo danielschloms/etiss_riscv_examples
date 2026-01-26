@@ -10,7 +10,7 @@ set(RISCV_ABI "ilp32" CACHE STRING "RISC-V ABI (-mabi)")
 set(AUTOVEC_FLAGS "")
 
 # set(RISCV_TOOLCHAIN_PREFIX "" CACHE STRING "optional prefix for the riscv toolchain in case it is not on the path")
-set(RISCV_TOOLCHAIN_PREFIX "$ENV{RISCV_NO_MLIB}/${RISCV_ARCH}")
+set(RISCV_TOOLCHAIN_PREFIX "$ENV{RISCV_GCC_DIR}/${RISCV_ARCH}")
 set(RISCV_TOOLCHAIN_BASENAME "riscv32-unknown-elf" CACHE STRING "base name of the toolchain executables")
 
 set(CMAKE_C_COMPILER clang)

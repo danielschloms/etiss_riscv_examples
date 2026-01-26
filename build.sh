@@ -1,10 +1,15 @@
 #!/usr/bin/bash
 
-PROJECT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-VERILATOR_DIR=$WS_PATH/vicuna2_tinyml_benchmarking
-ETISS_BUILD_BASE_DIR="$PROJECT_DIR/build"
-VERILATOR_BUILD_BASE_DIR="$VERILATOR_DIR/build_from_other"
+PROGRAMS_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PROJECT_ROOT_DIR="$(dirname "$PROGRAMS_DIR")"
 
+VICUNA_DIR="$PROJECT_ROOT_DIR/Vicuna2"
+PERFSIM_DIR="$PROJECT_ROOT_DIR/Perfsim"
+ETISS_BUILD_BASE_DIR="$PROGRAMS_DIR/build"
+VERILATOR_BUILD_BASE_DIR="$VICUNA_DIR/build_from_other"
+RISCV_GCC_DIR="$PROJECT_ROOT_DIR/Third_Party/RISCV_GCC"
+
+export RISCV_GCC_DIR=$RISCV_GCC_DIR
 POSITIONAL_ARGS=()
 
 # Default arguments
@@ -52,7 +57,7 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       ;;
     --ml)
-      CMAKE_TARGET="tflm_benchmarks"
+      CMAKE_TARGET="ml_bench"
       shift # past argument
       ;;
     --sanity)
@@ -73,19 +78,19 @@ done
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
 ZVL_STRING="zvl${VLEN}b"
-ETISS_BUILD_DIR=$PROJECT_DIR/build/etiss/$ARCH/$ZVL_STRING
-QEMU_BUILD_DIR=$PROJECT_DIR/build/qemu/$ARCH/$ZVL_STRING
-VERILATOR_BUILD_DIR=$VERILATOR_DIR/build_from_other/$ARCH/$ZVL_STRING
-TOOLCHAIN="$PROJECT_DIR/toolchain_files/${COMPILER}-toolchain.cmake"
-INSTALL_PATH_ETISS=$WS_PATH/gen_perfsim/target_sw/examples/Vicuna/custom/$ARCH/$ZVL_STRING
-INSTALL_PATH_QEMU=$WS_PATH/qemu-testing/bins/$ARCH/$ZVL_STRING
+ETISS_BUILD_DIR=$PROGRAMS_DIR/build/etiss/$ARCH/$ZVL_STRING
+QEMU_BUILD_DIR=$PROGRAMS_DIR/build/qemu/$ARCH/$ZVL_STRING
+VERILATOR_BUILD_DIR=$VICUNA_DIR/build_from_other/$ARCH/$ZVL_STRING
+TOOLCHAIN="$PROGRAMS_DIR/toolchain_files/${COMPILER}-toolchain.cmake"
+INSTALL_PATH_ETISS=$PERFSIM_DIR/target_sw/examples/Vicuna/custom/$ARCH/$ZVL_STRING
+INSTALL_PATH_QEMU=$PROJECT_ROOT_DIR/qemu-testing/bins/$ARCH/$ZVL_STRING
 
 if [[ "$CLEAN_BEFORE" = "true" ]]; then
   rm -rf $ETISS_BUILD_DIR
   rm -rf $VERILATOR_BUILD_DIR
 fi
 
-cmake -S $PROJECT_DIR -B $ETISS_BUILD_DIR \
+cmake -S $PROGRAMS_DIR -B $ETISS_BUILD_DIR \
   -DETISS=On \
   -DVERILATOR=Off \
   -DQEMU=Off \
@@ -97,7 +102,7 @@ cmake -S $PROJECT_DIR -B $ETISS_BUILD_DIR \
   -DVLEN=$VLEN \
   -G "$GENERATOR"
 
-# cmake -S $PROJECT_DIR -B $QEMU_BUILD_DIR \
+# cmake -S $PROGRAMS_DIR -B $QEMU_BUILD_DIR \
 #   -DETISS=Off \
 #   -DVERILATOR=Off \
 #   -DQEMU=On \
@@ -109,7 +114,7 @@ cmake -S $PROJECT_DIR -B $ETISS_BUILD_DIR \
 #   -DVLEN=$VLEN \
 #   -G "$GENERATOR"
 
-cmake -S $PROJECT_DIR -B $VERILATOR_BUILD_DIR \
+cmake -S $PROGRAMS_DIR -B $VERILATOR_BUILD_DIR \
   -DETISS=Off \
   -DVERILATOR=On \
   -DQEMU=Off \
@@ -127,9 +132,9 @@ cmake --build $VERILATOR_BUILD_DIR --target $CMAKE_TARGET -j$(nproc)
 cmake --install $ETISS_BUILD_DIR
 # cmake --install $QEMU_BUILD_DIR
 
-GCC_PATH=$RISCV_NO_MLIB/$ARCH
+GCC_ARCH_DIR=$RISCV_GCC_DIR/$ARCH
 GCC_PREFIX="riscv32-unknown-elf"
-OBJDUMP="$GCC_PATH/bin/$GCC_PREFIX-objdump"
+OBJDUMP="$GCC_ARCH_DIR/bin/$GCC_PREFIX-objdump"
 
 mkdir -p "$INSTALL_PATH_ETISS/dump"
 
