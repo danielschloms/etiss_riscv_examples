@@ -49,6 +49,7 @@ elseif(ETISS)
     add_executable_etiss(load_alu_vx_store load_alu_vx_store.S)
     add_executable_etiss(load_macc_vv_store load_macc_vv_store.S)
     add_executable_etiss(addloop addloop.c)
+    add_executable_etiss(matrix matrix.c)
     add_executable_etiss(longloop longloop.c)
 
     add_executable_etiss(thesis_addstore thesis_addstore.S)

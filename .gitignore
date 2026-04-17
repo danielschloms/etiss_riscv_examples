@@ -2,3 +2,5 @@ build
 install
 .vscode
 __pycache__/
+.clangd
+.cache/
