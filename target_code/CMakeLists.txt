@@ -4,7 +4,7 @@ macro(add_executable_etiss TARGET)
     add_executable(${TARGET} ${SRC_FILES})
     add_dependencies(${TARGET} etiss_crt0)
     target_link_libraries(${TARGET} PRIVATE etiss_crt0)
-    target_include_directories(${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/riscv_crt0 ${LIBS_DIR})
+    target_include_directories(${TARGET} PRIVATE ${BSPS_DIR}/bsp_etiss ${LIBS_DIR})
 
     configure_file(${ETISS_ELFINI} ${TARGET}.ini @ONLY)
 
@@ -21,23 +21,34 @@ macro(add_executable_qemu TARGET)
     install(TARGETS ${TARGET} DESTINATION bin OPTIONAL)
 endmacro()
 
+macro(add_executable_ara TARGET)
+    set(SRC_FILES "${ARGN}")
+
+    add_executable(${TARGET} ${SRC_FILES})
+    add_dependencies(${TARGET} ara_crt0)
+    target_link_libraries(${TARGET} PRIVATE ara_crt0)
+    target_include_directories(${TARGET} PRIVATE ${BSPS_DIR}/bsp_ara ${LIBS_DIR})
+
+    install(TARGETS ${TARGET} DESTINATION bin OPTIONAL)
+endmacro()
+
 macro(add_executable_verilator TARGET)
     set(SRC_FILES "${ARGN}")
 
     add_executable(${TARGET} ${SRC_FILES})
     add_dependencies(${TARGET} bsp_Vicuna)
     target_compile_definitions(${TARGET} PRIVATE VERILATOR)
-	target_link_options(${TARGET} PRIVATE "-nostartfiles")
+    target_link_options(${TARGET} PRIVATE "-nostartfiles")
     target_link_libraries(${TARGET} PRIVATE bsp_Vicuna UART_Vicuna)
-    target_include_directories(${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/verilator_bsp/lib ${LIBS_DIR})
-	set(DUMP_DIR "${CMAKE_BINARY_DIR}/dump")
-	set(PROG_DIR "${CMAKE_BINARY_DIR}/prog")
-	set(PROG_FILE "${PROG_DIR}/prog_${TARGET}.txt")
+    target_include_directories(${TARGET} PRIVATE ${BSPS_DIR}/bsp_vicuna/lib ${LIBS_DIR})
+    set(DUMP_DIR "${CMAKE_BINARY_DIR}/dump")
+    set(PROG_DIR "${CMAKE_BINARY_DIR}/prog")
+    set(PROG_FILE "${PROG_DIR}/prog_${TARGET}.txt")
 
     add_custom_command(TARGET ${TARGET}
         POST_BUILD
-		COMMAND mkdir -p ${DUMP_DIR}
-		COMMAND mkdir -p ${PROG_DIR}
+        COMMAND mkdir -p ${DUMP_DIR}
+        COMMAND mkdir -p ${PROG_DIR}
         COMMAND ${CMAKE_OBJCOPY} -O binary ${TARGET} ${TARGET}.bin
         COMMAND srec_cat ${TARGET}.bin -binary -offset 0x0000 -byte-swap 4 -o ${TARGET}.vmem -vmem
         COMMAND rm -f ${PROG_FILE}
@@ -71,6 +82,7 @@ add_custom_target(sanitycheck)
 add_custom_target(simple_bench)
 
 add_subdirectory(sanitycheck)
+add_subdirectory(matrix)
 add_subdirectory(simple_bench)
 if(TFLM)
     add_subdirectory(tflm)

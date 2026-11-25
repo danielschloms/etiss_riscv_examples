@@ -56,5 +56,17 @@
 #define V30 "11110"
 #define V31 "11111"
 
+#define QWMMACC_F7 "1110101"
+#define MMACC_F7 "1110001"
+
+#define MMACC(f7, vd, vs1, vs2)                                                \
+  asm volatile(".word 0b" f7 vs2 vs1 "000" vd "1010111")
+
+#define QWMMACC_INSTR(vd, vs1, vs2)                                             \
+  asm volatile(".word 0b1110101" vs2 vs1 "000" vd "1010111")
+
 #define MMACC_INSTR_R(vd, vs1, vs2)                                            \
   asm volatile(".word 0b1110001" vs2 vs1 "000" vd "1010111")
+
+#define FMMACC_INSTR_R(vd, vs1, vs2)                                           \
+  asm volatile(".word 0b0101001" vs2 vs1 "001" vd "1010111")

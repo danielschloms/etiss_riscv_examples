@@ -17,6 +17,7 @@ main:
 	li            a3, 10
 	li            a4, 128
 	MATCH_START
+	NOP_16
 	vsetvli       zero, zero, e32, m1, ta, ma
 	NOP_16
 	vle32.v       v0, (a2)
